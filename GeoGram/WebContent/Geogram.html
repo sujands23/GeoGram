@@ -1,0 +1,66 @@
+<DOCTYPE html>
+<head>
+	<meta charset="utf-8"/>
+	<title>geogram</title>
+</head>
+<body>
+		<input type="text" name="location" id="location" placeholder="Enter location"/>
+		<button onclick="getPhotos()">Submit</button></br>	
+		<img id="instagramImage" src=""></img>
+</body>
+<script>
+function getPhotos(){
+	console.log("Inside getPhotos() function");
+	var loc=document.getElementById('location').value;
+	var google_api_key="AIzaSyAiMtALQI1gIkSu0ee46PD531-bh40UHCM";
+	var maps_url="https://maps.googleapis.com/maps/api/geocode/json?address="+loc+"&key="+google_api_key;
+	console.log(maps_url);
+	var maps_json_data=executeMapsApi(maps_url);
+	console.log("End of main function");
+}
+function executeMapsApi(resturl){
+	console.log("Inside executeMapsApi() function");
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", resturl, false);
+	xhr.send();
+	console.log(xhr.status);
+	console.log(xhr.statusText);
+	var response = xhr.responseText;
+	//console.log("Response is :"+response);
+	maps_json_Decode(response);
+}
+function maps_json_Decode(jsonResult){
+	console.log("Inside maps_json_Decode() function");
+	obj=JSON.parse(jsonResult);
+	var latitude=obj.results[0].geometry.location.lat;
+	var longitude=obj.results[0].geometry.location.lng;
+	console.log("Latitude is :"+latitude);
+	console.log("Longitude is :"+longitude);
+	getInstagramUrl(latitude,longitude)
+}
+function getInstagramUrl(latitude,longitude){
+	console.log("Inside getInstagramUrl() function");
+	var instagram_access_token="50761239.c0edab8.9e4532e9c36d4cc1a7a2deed490ec434";
+	var instagram_url="https://api.instagram.com/v1/media/search?lat="+latitude+"&lng="+longitude+"&access_token="+instagram_access_token;
+	console.log("Instagram API URL : "+instagram_url);
+	executeInstagramApi(instagram_url);
+}
+function executeInstagramApi(resturl){
+	console.log("Inside executeInstagramApi() function");
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", resturl, false);
+	xhr.send();
+	console.log(xhr.status);
+	console.log(xhr.statusText);
+	var response = xhr.responseText;
+	//console.log("Response is :"+response);
+	instagram_json_Decode(response);
+}
+function instagram_json_Decode(json_response){
+	obj=JSON.parse(json_response);
+	var imageUrl=obj.data[0].images.low_resolution.url;
+	console.log("Image URL is : "+imageUrl);
+	document.getElementById("instagramImage").src=imageUrl;
+}
+</script>
+</html>
